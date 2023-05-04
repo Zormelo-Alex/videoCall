@@ -11,59 +11,82 @@ let socket;
 startButton.onclick = startCall;
 endButton.onclick = endCall;
  
-function startCall() {
-  console.log('Starting call...');
+async function startCall() {
+  try {
+    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    localVideo.srcObject = localStream;
  
-  const serverUrl = 'ws://' + window.location.hostname + ':5000';
-  const socket = new WebSocket(serverUrl);
+    const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+    peerConnection = new RTCPeerConnection(configuration);
  
-  socket.addEventListener('open', function(event) {
-    console.log('WebSocket connection opened:', event);
-    alert("WebSocket connection opened: ...")
+    peerConnection.addEventListener('icecandidate', handleConnection);
+    peerConnection.addEventListener('track', handleTrack);
  
-    const offer = peerConnection.createOffer();
-    //console.log(offer)
+    localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
  
-    peerConnection.setLocalDescription(offer).then(function() {
-      const message = {
-        type: 'offer',
-        payload: offer,
-      };
- 
-      console.log('Sending offer:', message);
- 
-      try {
-        socket.send(JSON.stringify(message));
-      } catch (error) {
-        console.error("Error sending message: ", error);
-      }
-      
+    const offer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(new RTCSessionDescription(offer));
+    
+    console.log('Starting call...');
+  
+    const serverUrl = 'ws://' + window.location.hostname + ':5000';
+    const socket = new WebSocket(serverUrl);
+  
+    socket.addEventListener('open', function(event) {
+      console.log('WebSocket connection opened:', event);
+      alert("WebSocket connection opened: ...")
+  
+      const offer = peerConnection.createOffer();
+      //console.log(offer)
+  
+      peerConnection.setLocalDescription(offer).then(function() {
+        const message = {
+          type: 'offer',
+          payload: offer,
+        };
+  
+        console.log('Sending offer:', message);
+  
+        try {
+          socket.send(JSON.stringify(message));
+        } catch (error) {
+          console.error("Error sending message: ", error);
+        }
+        
+      });
     });
-  });
- 
-  socket.addEventListener('message', function(event) {
-    console.log('Received message from server:', event);
- 
-    const message = JSON.parse(event.data);
- 
-    switch (message.type) {
-      case 'answer':
-        handleAnswerMessage(message.payload);
-        break;
-      case 'icecandidate':
-        handleIceCandidateMessage(message.payload);
-        break;
-      default:
-        console.error('Unknown message type:', message.type);
-        break;
-    }
-  });
- 
-  socket.addEventListener('close', function(event) {
-    console.log('WebSocket connection closed:', event);
-    alert('WebSocket connection closed: ...')
-  });
+  
+    socket.addEventListener('message', function(event) {
+      console.log('Received message from server:', event);
+  
+      const message = JSON.parse(event.data);
+  
+      switch (message.type) {
+        case 'answer':
+          handleAnswerMessage(message.payload);
+          break;
+        case 'icecandidate':
+          handleIceCandidateMessage(message.payload);
+          break;
+        default:
+          console.error('Unknown message type:', message.type);
+          break;
+      }
+    });
+  
+    socket.addEventListener('close', function(event) {
+      console.log('WebSocket connection closed:', event);
+      alert('WebSocket connection closed: ...')
+    });
+
+
+  } catch (error) {
+    console.error('Error starting call:', error);
+  }
 }
+// function startCall() {
+
+// }
  
 function endCall() {
   localStream.getTracks().forEach(track => track.stop());

@@ -10,8 +10,8 @@ httpServer.on('error', function(error) {
   console.error('Server error:', error);
 });
 
-httpServer.listen(8000, function() {
-  console.log('Server listening on port 8000');
+httpServer.listen(3000, function() {
+  console.log('Server listening on port 3000');
 });
 
 const wss = new WebSocket.Server({ port: 5000 }, function() {
