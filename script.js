@@ -14,13 +14,15 @@ endButton.onclick = endCall;
 function startCall() {
   console.log('Starting call...');
  
-  const serverUrl = 'ws://' + window.location.hostname + ':8080';
+  const serverUrl = 'ws://' + window.location.hostname + ':5000';
   const socket = new WebSocket(serverUrl);
  
   socket.addEventListener('open', function(event) {
     console.log('WebSocket connection opened:', event);
+    alert("WebSocket connection opened: ...")
  
     const offer = peerConnection.createOffer();
+    //console.log(offer)
  
     peerConnection.setLocalDescription(offer).then(function() {
       const message = {
@@ -30,7 +32,12 @@ function startCall() {
  
       console.log('Sending offer:', message);
  
-      socket.send(JSON.stringify(message));
+      try {
+        socket.send(JSON.stringify(message));
+      } catch (error) {
+        console.error("Error sending message: ", error);
+      }
+      
     });
   });
  
@@ -54,6 +61,7 @@ function startCall() {
  
   socket.addEventListener('close', function(event) {
     console.log('WebSocket connection closed:', event);
+    alert('WebSocket connection closed: ...')
   });
 }
  

@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="./styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.min.js"></script>
     <script>
-      const ws = io('http://localhost:8080');
+      const ws = io('https://localhost:5000');
      
       ws.on('connect', function() {
         console.log('Connected to signaling server');

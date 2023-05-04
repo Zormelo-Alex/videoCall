@@ -5,9 +5,19 @@ const io = require('socket.io')(httpServer, {
     origin: '*',
   },
 });
- 
-const wss = new WebSocket.Server({ port: 8080 });
- 
+
+httpServer.on('error', function(error) {
+  console.error('Server error:', error);
+});
+
+httpServer.listen(8000, function() {
+  console.log('Server listening on port 8000');
+});
+
+const wss = new WebSocket.Server({ port: 5000 }, function() {
+  console.log('WebSocket server started');
+});
+
 wss.on('connection', function connection(ws) {
   console.log('New client connected');
  
@@ -60,8 +70,4 @@ function broadcastMessage(senderId, message) {
   });
 }
 
-const PORT = process.env.PORT || 8080;
 
-httpServer.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});

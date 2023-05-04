@@ -1,20 +1,24 @@
+body{
+  background-color: gray;
+}
 .container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 700px;
   background-color: #f2f2f2;
+  padding: 1rem;
 }
  
 .local-video-container,
 .remote-video-container {
-  width: 50%;
-  height: 50%;
+  width: 40%;
+  height: 35%;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 20px;
+  margin-bottom: 1rem;
   border: 2px solid #333;
 }
  
@@ -36,10 +40,11 @@ button {
   margin: 10px;
   font-size: 16px;
   color: #fff;
-  background-color: #333;
+  background-color: crimson;
   border: none;
-  border-radius: 4px;
+  border-radius: 7px;
   cursor: pointer;
+  transition: all .3s ease;
 }
  
 button:hover {
