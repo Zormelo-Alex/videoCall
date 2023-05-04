@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Video Call Application</title>
+    <link rel="stylesheet" href="./styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.min.js"></script>
+    <script>
+      const ws = io('http://localhost:8080');
+     
+      ws.on('connect', function() {
+        console.log('Connected to signaling server');
+      });
+     
+      ws.on('message', function(message) {
+        console.log('Received message:', message);
+     
+        const parsedMessage = JSON.parse(message);
+     
+        switch (parsedMessage.type) {
+          case 'offer':
+            handleOffer(parsedMessage.data);
+            break;
+          case 'answer':
+            handleAnswer(parsedMessage.data);
+            break;
+          case 'icecandidate':
+            handleIceCandidate(parsedMessage.data);
+            break;
+          default:
+            console.error('Unknown message type:', parsedMessage.type);
+            break;
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="local-video-container">
+        <video id="local-video" autoplay></video>
+      </div>
+      <div class="remote-video-container">
+        <video id="remote-video" autoplay></video>
+      </div>
+      <div class="button-container">
+        <button id="start-call">Start Call</button>
+        <button id="end-call">End Call</button>
+      </div>
+    </div>
+    <script src="./script.js"></script>
+  </body>
+</html>
